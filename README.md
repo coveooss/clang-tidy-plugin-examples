@@ -5,32 +5,13 @@ This folder contains [clang-tidy plugins](https://reviews.llvm.org/D111100).
 ## Quick Start
 
 To use the plugins, you need at least the version 14.0 of LLVM/Clang.
+There are 3 alternate ways you can proceed.
 
-### Installing clang
+### 1. Installing clang
 
-1. On Ubuntu, you can install LLVM/Clang version 15 with
+1. On Ubuntu, you can install LLVM/Clang version 15 with the script [installClang15.sh](./installClang15.sh)
     ```shell
-    export DEBIAN_FRONTEND=noninteractive
-        sudo apt update
-        sudo --preserve-env apt-get install --assume-yes --no-install-recommends curl gpg
-        mkdir --parents /usr/share/keyrings/
-        curl --fail --location --show-error --silent https://apt.llvm.org/llvm-snapshot.gpg.key \
-            | gpg --dearmor - \
-            | sudo tee /usr/share/keyrings/llvm-toolchain-15.gpg > /dev/null
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/llvm-toolchain-15.gpg] http://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-15 main
-    deb-src [arch=amd64 signed-by=/usr/share/keyrings/llvm-toolchain-15.gpg] http://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-15 main" \
-            | sudo tee /etc/apt/sources.list.d/llvm-toolchain-15.list
-        sudo apt update
-        sudo --preserve-env apt install --assume-yes \
-            clang-15 \
-            clang-format-15 \
-            clang-tidy-15 \
-            libclang-15-dev \
-            llvm-15-dev
-        sudo update-alternatives --install /usr/local/bin/clang clang /usr/bin/clang-15 99
-        sudo update-alternatives --install /usr/local/bin/clang++ clang++ /usr/bin/clang++-15 99
-        sudo update-alternatives --install /usr/local/bin/clang-format clang-format /usr/bin/clang-format-15 99
-        sudo update-alternatives --install /usr/local/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-15 99
+    ./installClang15.sh
     ```
 1. Build the `clang-tidy-plugin-example` project
     ```shell
@@ -54,27 +35,34 @@ To use the plugins, you need at least the version 14.0 of LLVM/Clang.
     ```
 1. That's it, you can now use the plugin!
     ```shell
-    clang-tidy \
+    > clang-tidy \
         --checks='awesomeprefixcheck' \
         --load build/lib/libAwesomePrefixCheck.so \
         -p buildRepoUsingPlugin/compile_commands.json \
         repo-using-plugin/src/code.cpp
+
+    1 warning generated.
+    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:1:5: warning: function 'f' is insufficiently awesome [awesomeprefixcheck]
+    int f() { return 0; }
+        ^
+    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:1:5: note: insert 'awesome'
+    int f() { return 0; }
+        ^
+        awesome_
     ```
 
-### Using a container image
+### 2. Using a container image
 
 See [testcpp.yml](.github/workflows/testcpp.yml).
 
-### Building clang
+### 3. Building clang
 
-If you feel adventurous,
-
-1. Get a recent version of LLVM/Clang (14.0 at least)
+1. Build a recent version of LLVM/Clang (14.0 at least)
     ```shell
     cd $HOME/src
     git clone https://github.com/llvm/llvm-project
     cd llvm-project
-    git checkout 178674e23a7129fd8b10d72a5f9722fb876f8c15 # optional
+    git checkout 4af73d7ebb5bf4bc2045d15ae0f4ebce56f2d86f # optional
     cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra' -B build -S llvm
     cmake --build build
     cmake --install build --prefix staging
@@ -98,7 +86,6 @@ If you feel adventurous,
     ```
 1. To use your plugin, you need to compile your code with the same clang version used to run the plugin, and to export the compile database with `CMAKE_EXPORT_COMPILE_COMMANDS=ON`
     ```shell
-    cd $HOME/src/repo-using-plugin
     CC=$HOME/src/llvm-project/staging/bin/clang \
     CXX=$HOME/src/llvm-project/staging/bin/clang++ \
         cmake \
@@ -108,11 +95,18 @@ If you feel adventurous,
     ```
 1. That's it, you can now use the plugin!
     ```shell
-    $HOME/src/llvm-project/staging/bin/clang-tidy \
+    > $HOME/src/llvm-project/staging/bin/clang-tidy \
         --checks='awesomeprefixcheck' \
         --load build/lib/libAwesomePrefixCheck.so \
         -p buildRepoUsingPlugin/compile_commands.json \
-        repo-using-plugin/src/File.cpp
+        repo-using-plugin/src/code.cpp
+
+    1 warning generated.
+    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:1:5: warning: function 'f' is insufficiently awesome [awesomeprefixcheck]
+    int f() { return 0; }
+        ^
+    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:1:5: note: insert 'awesome'
+    int f() { return 0; }
     ```
 
 ## References

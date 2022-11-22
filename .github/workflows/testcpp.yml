@@ -25,7 +25,10 @@ jobs:
             DEBIAN_FRONTEND: noninteractive
         run: |
           apt-get update
-          apt-get install --assume-yes --no-install-recommends libclang-14-dev llvm-14-dev
+          apt-get install --assume-yes --no-install-recommends \
+            clang-tidy \
+            libclang-14-dev \
+            llvm-14-dev
       - name: Run Tests
         run: |
           cmake -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -B build -S .
