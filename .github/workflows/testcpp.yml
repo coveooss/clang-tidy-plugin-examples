@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -28,7 +28,6 @@ jobs:
           apt-get install --assume-yes --no-install-recommends libclang-14-dev llvm-14-dev
       - name: Run Tests
         run: |
-          cd clang-tidy-plugins
-          cmake -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -B ${{matrix.buildType}} -S .
-          cmake --build ${{matrix.buildType}}
+          cmake -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -B build -S .
+          cmake --build build
           ctest

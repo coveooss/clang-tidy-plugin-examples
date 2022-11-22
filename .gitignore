@@ -9,3 +9,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+[B|b]uild/*
+[D|d]ebug/*
+[R|r]elease/*
