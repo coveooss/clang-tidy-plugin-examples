@@ -10,6 +10,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
+.cache
+[B|b]uildRepoUsingPlugin
 [B|b]uild/*
 [D|d]ebug/*
 [R|r]elease/*

@@ -32,7 +32,7 @@ To use the plugins, you need at least the version 14.0 of LLVM/Clang.
         sudo update-alternatives --install /usr/local/bin/clang-format clang-format /usr/bin/clang-format-15 99
         sudo update-alternatives --install /usr/local/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-15 99
     ```
-1. You can then build the `clang-tidy-plugin-example` project
+1. Build the `clang-tidy-plugin-example` project
     ```shell
     cmake -DCMAKE_BUILD_TYPE=Release -B build -S .
     cmake --build build
@@ -47,22 +47,23 @@ To use the plugins, you need at least the version 14.0 of LLVM/Clang.
     ```
 1. To use your plugin, you need to export the compile database with `CMAKE_EXPORT_COMPILE_COMMANDS=ON`
     ```shell
-    cd $HOME/src/repo-using-plugin
-    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -B build -S .
-    cmake --build build
+    cmake \
+        -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
+        -B buildRepoUsingPlugin -S repo-using-plugin
+    cmake --build buildRepoUsingPlugin
     ```
 1. That's it, you can now use the plugin!
     ```shell
     clang-tidy \
         --checks='awesomeprefixcheck' \
-        --load $HOME/src/clang-tidy-plugin-example/build/lib/libAwesomePrefixCheck.so \
-        -p build/compile_commands.json \
-        src/File.cpp
+        --load build/lib/libAwesomePrefixCheck.so \
+        -p buildRepoUsingPlugin/compile_commands.json \
+        repo-using-plugin/src/code.cpp
     ```
 
 ### Using a container image
 
-See the approach used in [testcpp.yml](.github/workflows/testcpp.yml).
+See [testcpp.yml](.github/workflows/testcpp.yml).
 
 ### Building clang
 
@@ -78,7 +79,7 @@ If you feel adventurous,
     cmake --build build
     cmake --install build --prefix staging
     ```
-1. You can then build the `clang-tidy-plugin-example` project
+1. Build the `clang-tidy-plugin-example` project
     ```shell
     cmake \
         -DClang_DIR=$HOME/src/llvm-project/staging/lib/cmake/clang \
@@ -101,17 +102,17 @@ If you feel adventurous,
     CC=$HOME/src/llvm-project/staging/bin/clang \
     CXX=$HOME/src/llvm-project/staging/bin/clang++ \
         cmake \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -B debug -S .
-    cmake --build debug
+            -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -B buildRepoUsingPlugin -S repo-using-plugin
+    cmake --build buildRepoUsingPlugin
     ```
 1. That's it, you can now use the plugin!
     ```shell
     $HOME/src/llvm-project/staging/bin/clang-tidy \
         --checks='awesomeprefixcheck' \
-        --load $HOME/src/clang-tidy-plugin-example/build/lib/libAwesomePrefixCheck.so \
-        -p build/compile_commands.json \
-        src/File.cpp
+        --load build/lib/libAwesomePrefixCheck.so \
+        -p buildRepoUsingPlugin/compile_commands.json \
+        repo-using-plugin/src/File.cpp
     ```
 
 ## References
