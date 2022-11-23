@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -25,10 +25,22 @@ jobs:
             DEBIAN_FRONTEND: noninteractive
         run: |
           apt-get update
-          apt-get install --assume-yes --no-install-recommends libclang-14-dev llvm-14-dev
+          apt-get install --assume-yes --no-install-recommends \
+            clang-tidy \
+            libclang-14-dev \
+            llvm-14-dev
       - name: Run Tests
         run: |
-          cd clang-tidy-plugins
-          cmake -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -B ${{matrix.buildType}} -S .
-          cmake --build ${{matrix.buildType}}
-          ctest
+          cmake -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -B build -S .
+          cmake --build build
+
+          cmake \
+            -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -B buildRepoUsingPlugin -S repo-using-plugin
+          cmake --build buildRepoUsingPlugin
+
+          clang-tidy \
+            --checks='awesomeprefixcheck' \
+            --load build/lib/libAwesomePrefixCheck.so \
+            -p buildRepoUsingPlugin/compile_commands.json \
+            repo-using-plugin/src/code.cpp
