@@ -1,6 +1,6 @@
 # clang-tidy plugins
 
-This folder contains [clang-tidy plugins](https://reviews.llvm.org/D111100).
+This repository contains a complete (trivial) example of a [clang-tidy plugin](https://reviews.llvm.org/D111100).
 
 ## Quick Start
 
