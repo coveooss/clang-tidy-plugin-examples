@@ -42,13 +42,10 @@ There are 3 alternate ways you can proceed.
         repo-using-plugin/src/code.cpp
 
     1 warning generated.
-    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:1:5: warning: function 'f' is insufficiently awesome [awesomeprefixcheck]
+    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:2:5: warning: function 'f' is insufficiently awesome [awesomeprefixcheck]
     int f() { return 0; }
         ^
-    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:1:5: note: insert 'awesome'
-    int f() { return 0; }
-        ^
-        awesome_
+        awesome_f
     ```
 
 ### 2. Using a container image
@@ -102,11 +99,10 @@ See [testcpp.yml](.github/workflows/testcpp.yml).
         repo-using-plugin/src/code.cpp
 
     1 warning generated.
-    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:1:5: warning: function 'f' is insufficiently awesome [awesomeprefixcheck]
+    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:2:5: warning: function 'f' is insufficiently awesome [awesomeprefixcheck]
     int f() { return 0; }
         ^
-    /home/klalumiere/src/coveo/clang-tidy-plugin-example/repo-using-plugin/src/code.cpp:1:5: note: insert 'awesome'
-    int f() { return 0; }
+        awesome_f
     ```
 
 ## References
