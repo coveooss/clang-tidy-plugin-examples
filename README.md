@@ -17,25 +17,25 @@ To use the plugin,
 
 1. You can list the plugin with
     ```shell
-    clang-tidy \
+    clang-tidy-16 \
             --checks='*' \
             --load build/lib/libAwesomePrefixCheck.so \
             --list-checks \
-        | grep awesomeprefixcheck
+        | grep coveo-awesomeprefixcheck
     ```
 1. To use the plugin, you need to compile the code you want to use the plugin on, and to export the compile database with `CMAKE_EXPORT_COMPILE_COMMANDS=ON`
     ```shell
-    cmake -B buildCglbaselib -S $CPP_COVEO/cglbaselib \
+    cmake -B buildRepoUsingPlugin -S repo-using-plugin \
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-    cmake --build buildCglbaselib
+    cmake --build buildRepoUsingPlugin
     ```
 1. That's it, you can now use the plugin!
     ```shell
-    clang-tidy \
-        --checks='awesomeprefixcheck' \
+    clang-tidy-16 \
+        --checks='coveo-awesomeprefixcheck' \
         --load build/lib/libAwesomePrefixCheck.so \
-        -p buildCglbaselib/compile_commands.json \
-        $CPP_COVEO/cglbaselib/CGLBaseLib/CGLBase/src/CGLBinaryStreamBuffer.cpp
+        -p buildRepoUsingPlugin/compile_commands.json \
+        repo-using-plugin/src/code.cpp
     ```
 
 ## How to iterate quickly
