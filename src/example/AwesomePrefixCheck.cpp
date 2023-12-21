@@ -1,58 +1,56 @@
-// Based on https://github.com/llvm-mirror/clang-tools-extra/blob/master/clang-tidy/add_new_check.py
-
+#include "clang/AST/ASTContext.h"
+#include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang-tidy/ClangTidy.h"
+#include "clang-tidy/ClangTidyCheck.h"
 #include "clang-tidy/ClangTidyModule.h"
 #include "clang-tidy/ClangTidyModuleRegistry.h"
-#include "clang-tidy/utils/TransformerClangTidyCheck.h"
-#include "clang/Tooling/Transformer/RewriteRule.h" // makeRule
-#include "clang/Tooling/Transformer/Stencil.h" // cat
 
-namespace {
+using namespace clang;
+using namespace clang::tidy;
+using namespace clang::ast_matchers;
 
-using ::clang::StringRef;
-using ::clang::tidy::ClangTidyCheckFactories;
-using ::clang::tidy::ClangTidyContext;
-using ::clang::tidy::ClangTidyModule;
-using ::clang::tidy::utils::TransformerClangTidyCheck;
-using ::clang::transformer::cat;
-using ::clang::transformer::changeTo;
-using ::clang::transformer::makeRule;
-using ::clang::transformer::name;
-
-using namespace ::clang::ast_matchers;
-
-auto createAwesomePrefixRule() {
-    constexpr auto f = "addAwesomePrefix";
-    return makeRule(traverse(clang::TK_IgnoreUnlessSpelledInSource, functionDecl(unless(matchesName("awesome_"))).bind(f)),
-                         changeTo(name(f), cat("awesome_",  name(f))),
-                         cat("function '", name(f), "' is insufficiently awesome"));
-}
-
-// Boilerplate
-
-class AwesomePrefixCheck : public TransformerClangTidyCheck
+class AwesomePrefixCheck : public ClangTidyCheck
 {
 public:
-    AwesomePrefixCheck(StringRef Name, ClangTidyContext* Context)
-     : TransformerClangTidyCheck(createAwesomePrefixRule(), Name, Context)
+    AwesomePrefixCheck(StringRef Name, ClangTidyContext* Context) : ClangTidyCheck(Name, Context)
     {
     }
+    void registerMatchers(ast_matchers::MatchFinder* Finder) override;
+    void check(const ast_matchers::MatchFinder::MatchResult& Result) override;
 };
+
+void AwesomePrefixCheck::registerMatchers(MatchFinder* Finder)
+{
+    Finder->addMatcher(functionDecl().bind("add_awesome_prefix"), this);
+}
+
+void AwesomePrefixCheck::check(const MatchFinder::MatchResult& Result)
+{
+    const auto* MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("add_awesome_prefix");
+    if (!MatchedDecl->getIdentifier() || MatchedDecl->getName().startswith("awesome_"))
+        return;
+    diag(MatchedDecl->getLocation(), "function %0 is insufficiently awesome") << MatchedDecl;
+    diag(MatchedDecl->getLocation(), "insert 'awesome'", DiagnosticIDs::Note) << FixItHint::CreateInsertion(MatchedDecl->getLocation(), "awesome_");
+}
+
+namespace {
 
 class AwesomePrefixCheckModule : public ClangTidyModule
 {
 public:
     void addCheckFactories(ClangTidyCheckFactories& CheckFactories) override
     {
-        CheckFactories.registerCheck<AwesomePrefixCheck>("awesomeprefixcheck");
+        CheckFactories.registerCheck<AwesomePrefixCheck>("coveo-awesomeprefixcheck");
     }
 };
 
-} // anonymous
+}  // namespace
 
 namespace clang::tidy {
 
 // Register the module using this statically initialized variable.
-static ClangTidyModuleRegistry::Add<::AwesomePrefixCheckModule> awesomePrefixCheckInit("awesomeprefixcheck-module", "Adds 'awesomeprefixcheck'.");
+static ClangTidyModuleRegistry::Add<::AwesomePrefixCheckModule> awesomePrefixCheckInit("coveo-awesomeprefixcheck-module",
+                                                                                       "Adds 'coveo-awesomeprefixcheck' checks.");
 
 // This anchor is used to force the linker to link in the generated object file and thus register the module.
 volatile int awesomePrefixCheckAnchorSource = 0;

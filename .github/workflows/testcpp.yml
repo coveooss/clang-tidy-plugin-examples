@@ -5,34 +5,45 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+
 jobs:
-  testcpp:
-    name: Test C++
+  main:
+    name: CI
     runs-on: ubuntu-22.04
-    container:
-      image: klalumiere/ubuntu-clang:22-14
     strategy:
       matrix:
         buildType: [
           Debug,
           RelWithDebInfo,
         ]
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Prepare environment
+      - uses: actions/checkout@v4
+      - name: Setup
         env:
-            DEBIAN_FRONTEND: noninteractive
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          apt-get update
-          apt-get install --assume-yes --no-install-recommends \
-            clang-tidy \
-            libclang-14-dev \
-            llvm-14-dev
-      - name: Run Tests
+          ./installClang16.sh
+          sudo apt-get update
+          sudo --preserve-env apt-get install --assume-yes \
+              cmake \
+              ninja-build
+      - name: Configuration
+        env:
+          CC: clang-16
+          CXX: clang++-16
         run: |
-          cmake -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -B build -S .
-          cmake --build build
+          cmake -B build -G Ninja -S . \
+            -D Clang_DIR=/usr/lib/cmake/clang-16 \
+            -D LLVM_DIR=/usr/lib/llvm-16/cmake \
+            -D CMAKE_BUILD_TYPE=${{matrix.buildType}}
+      - name: Build
+        run: cmake --build build
+      - name: Test
+        run: |          
+          ctest --test-dir build
 
           cmake \
             -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
@@ -40,7 +51,7 @@ jobs:
           cmake --build buildRepoUsingPlugin
 
           clang-tidy \
-            --checks='awesomeprefixcheck' \
+            --checks='coveo-awesomeprefixcheck' \
             --load build/lib/libAwesomePrefixCheck.so \
             -p buildRepoUsingPlugin/compile_commands.json \
             repo-using-plugin/src/code.cpp
