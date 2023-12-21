@@ -1,0 +1,1 @@
+cmake --build ../../build && clang-tidy --fix --checks='-*,coveo-replaceautoptrbystdcheck' --load=../../build/lib/libReplaceAutoPtrByStdCheck.so -p ../../build/compile_commands.json TestCallsReplacementsAutoPtr.cpp

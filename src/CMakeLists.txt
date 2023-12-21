@@ -1,1 +1,6 @@
 add_subdirectory(example)
+add_subdirectory(replace_autoptr_by_std)
+add_subdirectory(replace_by_get_executable_path)
+add_subdirectory(replace_cglpath_by_std)
+add_subdirectory(replace_smartptr_by_std)
+
