@@ -5,7 +5,7 @@ This folder contains [clang-tidy plugins](https://reviews.llvm.org/D111100).
 ## Quick Start
 
 To build the plugins, first, you'll need LLVM/Clang version 16.
-On Ubuntu, you can install them with the script `installClang16.sh`.
+On Ubuntu, you can install them with the script `installClang16.sh` (see [testcpp.yml](.github/workflows/testcpp.yml) for more details).
 Then,
 
 ```shell
