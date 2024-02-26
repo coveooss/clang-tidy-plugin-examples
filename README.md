@@ -2,6 +2,10 @@
 
 This folder contains [clang-tidy plugins](https://reviews.llvm.org/D111100).
 
+## Slides
+
+The knowledge related to this repo was presented at a C++ meetup event on Febraury 21st, 2024. You can find the slides from this presentation in [clang-tidy-coveo.pdf](clang-tidy-coveo.pdf).
+
 ## Quick Start
 
 To build the plugins, first, you'll need LLVM/Clang version 16.
